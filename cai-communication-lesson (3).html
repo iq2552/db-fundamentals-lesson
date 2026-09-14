@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>สื่อนวัตกรรมดิจิทัล | ฐานข้อมูลเบื้องต้น | มัธยมบ้านบางกะปิ</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📖</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@500;600;700;800&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#3A2E1F;
+    --grad-header1:#6E74E8; --grad-header2:#8A4FD1;
+    --pink1:#F6A8C0; --pink2:#FBC9AE;
+    --mint1:#BDEBC9; --mint2:#9FE0D8;
+    --peach1:#FCD9A8; --peach2:#FBBE9E;
+    --blue1:#63B3EA; --blue2:#2F7FE0;
+    --teal1:#22C6A0; --teal2:#189A8C;
+    --red1:#F0766B; --red2:#D8432E;
+    --purple1:#7B7EF0; --purple2:#9257D9;
+    --vocab1:#BFD7F5; --vocab2:#E4C6EF;
+  }
+  *{box-sizing:border-box;}
+  html,body{ margin:0; padding:0; min-height:100%; }
+  body{
+    font-family:'Noto Sans Thai',sans-serif;
+    color:var(--ink);
+    background:linear-gradient(180deg,#FDF7D9 0%, #FCE9A8 100%);
+    min-height:100vh; position:relative; overflow-x:hidden;
+  }
+  h1,h2,h3,.headfont{ font-family:'Kanit',sans-serif; }
+
+  .blob{ position:fixed; border-radius:50%; background:#fff; opacity:.35; filter:blur(2px); pointer-events:none; z-index:0; }
+  .b1{ width:420px; height:420px; top:-140px; left:-120px; }
+  .b2{ width:340px; height:340px; top:30%; right:-140px; }
+  .b3{ width:520px; height:520px; bottom:-220px; left:10%; opacity:.3; }
+  .b4{ width:220px; height:220px; top:60%; left:-80px; opacity:.28; }
+
+  #app{ position:relative; z-index:1; max-width:900px; margin:0 auto; padding:24px 18px 60px; }
+  .hidden{ display:none !important; }
+
+  /* ---------- header banner (top small bar) ---------- */
+  .topbar{
+    background:linear-gradient(90deg,var(--grad-header1),var(--grad-header2));
+    color:#fff; text-align:center; font-family:'Kanit',sans-serif; font-weight:700; font-size:15px;
+    padding:14px; border-radius:16px; margin-bottom:16px;
+    box-shadow:0 8px 18px rgba(110,116,232,0.28);
+  }
+
+  /* ---------- hero banner (per-section title) ---------- */
+  .hero{
+    background:linear-gradient(90deg,var(--grad-header1),var(--grad-header2));
+    color:#fff; border-radius:20px; padding:26px 30px; margin-bottom:18px;
+    box-shadow:0 10px 24px rgba(110,116,232,0.3);
+  }
+  .hero h2{ margin:0; font-size:26px; font-weight:700; display:flex; align-items:center; gap:10px; }
+  .hero .sub{ margin-top:8px; font-size:14px; opacity:.95; font-weight:500; }
+  .hero .welcome{ margin-top:4px; font-size:14px; font-weight:600; }
+
+  /* ---------- white content card ---------- */
+  .card{
+    background:#fff; border-radius:22px; padding:28px 26px; margin-bottom:18px;
+    box-shadow:0 10px 26px rgba(58,46,31,0.08);
+  }
+  .card h3{ margin:0 0 18px; font-size:19px; text-align:center; }
+  .card .center-sub{ text-align:center; font-size:13px; opacity:.65; margin:-10px 0 18px; }
+
+  /* ---------- buttons ---------- */
+  .btn{
+    font-family:'Kanit',sans-serif; font-weight:600; font-size:15px; border:none; cursor:pointer;
+    color:#fff; padding:13px 26px; border-radius:14px;
+    background:linear-gradient(90deg,var(--grad-header1),var(--grad-header2));
+    box-shadow:0 6px 14px rgba(110,116,232,0.35);
+    transition:transform .12s ease, filter .12s ease;
+  }
+  .btn:hover{ transform:translateY(-2px); filter:brightness(1.05); }
+  .btn:active{ transform:translateY(1px); }
+  .btn:disabled{ opacity:.45; cursor:not-allowed; transform:none; }
+  .btn.red{ background:linear-gradient(90deg,var(--red1),var(--red2)); box-shadow:0 6px 14px rgba(216,67,46,0.35); }
+  .btn.block{ width:100%; display:block; text-align:center; }
+
+  /* ---------- LOGIN ---------- */
+  #sec-login .card{ text-align:center; max-width:520px; margin-left:auto; margin-right:auto; }
+  #sec-login .wave{ font-size:44px; margin-bottom:6px; }
+  #sec-login h3{ margin-bottom:4px; }
+  #loginForm{ margin-top:18px; }
+  .inputwrap{ position:relative; margin-bottom:18px; }
+  .inputwrap::before, .inputwrap::after{
+    content:""; position:absolute; width:10px; height:10px; border-radius:50%;
+    background:linear-gradient(135deg,var(--pink1),var(--purple1));
+  }
+  .inputwrap::before{ top:-5px; left:24px; }
+  .inputwrap::after{ bottom:-5px; left:24px; }
+  #loginForm input{
+    width:100%; font-family:'Noto Sans Thai',sans-serif; font-size:15px;
+    padding:14px 18px; border-radius:14px; border:2px solid var(--purple1); outline:none;
+  }
+
+  /* ---------- HOME dashboard ---------- */
+  .dashgrid{ display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:18px; }
+  .dcard{
+    position:relative; border-radius:20px; padding:26px 16px; text-align:center; cursor:pointer;
+    border:none; font-family:'Noto Sans Thai',sans-serif;
+    transition:transform .15s ease, box-shadow .15s ease;
+    box-shadow:0 8px 18px rgba(58,46,31,0.1);
+  }
+  .dcard:hover:not(:disabled){ transform:translateY(-5px); box-shadow:0 14px 26px rgba(58,46,31,0.16); }
+  .dcard:disabled{ cursor:not-allowed; opacity:.55; }
+  .dcard .dico{
+    width:54px; height:54px; border-radius:16px; background:rgba(255,255,255,0.75);
+    display:flex; align-items:center; justify-content:center; font-size:26px;
+    margin:0 auto 12px; box-shadow:0 4px 10px rgba(0,0,0,0.08);
+  }
+  .dcard .dtitle{ font-family:'Kanit',sans-serif; font-weight:700; font-size:16px; color:var(--ink); }
+  .dcard .ddesc{ font-size:12px; color:var(--ink); opacity:.75; margin-top:5px; line-height:1.4; }
+  .dcard .dlock{ position:absolute; top:10px; right:12px; font-size:16px; }
+  .dcard.pink{ background:linear-gradient(135deg,var(--pink1),var(--pink2)); }
+  .dcard.mint{ background:linear-gradient(135deg,var(--mint1),var(--mint2)); }
+  .dcard.peach{ background:linear-gradient(135deg,var(--peach1),var(--peach2)); }
+
+  /* ---------- content tabs ---------- */
+  .tabrow{ display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap; }
+  .tabbtn{
+    flex:1 1 150px; font-family:'Kanit',sans-serif; font-weight:600; font-size:13px; cursor:pointer;
+    border:none; padding:12px 10px; border-radius:14px; background:rgba(255,255,255,0.6); color:var(--ink);
+    transition:all .15s ease;
+  }
+  .tabbtn.active{ background:linear-gradient(90deg,var(--grad-header1),var(--grad-header2)); color:#fff; }
+
+  .vocabgrid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:16px; }
+  .vcard{
+    background:linear-gradient(135deg,var(--vocab1),var(--vocab2));
+    border-radius:18px; padding:20px 14px; text-align:center;
+    transition:transform .15s ease;
+  }
+  .vcard:hover{ transform:translateY(-4px); }
+  .vcard .emoji{ font-size:30px; margin-bottom:8px; }
+  .vcard .en{ font-family:'Kanit',sans-serif; font-weight:700; font-size:15px; color:var(--ink); }
+  .vcard .th{ font-size:13px; color:var(--ink); opacity:.7; margin-top:3px; }
+
+  .situation{ border-radius:18px; padding:20px 22px; margin-bottom:16px; color:#fff; }
+  .situation .stitle{ font-family:'Kanit',sans-serif; font-weight:700; font-size:15px; margin-bottom:6px; }
+  .situation .line{ font-size:13.5px; margin:4px 0; line-height:1.6; opacity:.96; }
+  .situation .who{ font-weight:700; }
+  .sit-blue{ background:linear-gradient(90deg,var(--blue1),var(--blue2)); }
+  .sit-teal{ background:linear-gradient(90deg,var(--teal1),var(--teal2)); }
+  .sit-red{ background:linear-gradient(90deg,var(--red1),var(--red2)); }
+  .sit-purple{ background:linear-gradient(90deg,var(--purple1),var(--purple2)); }
+  .sit-orange{ background:linear-gradient(90deg,var(--peach2),var(--red1)); }
+
+  /* ---------- test ---------- */
+  .timerbar{
+    background:linear-gradient(90deg,var(--red1),var(--red2)); color:#fff; text-align:center;
+    font-family:'Kanit',sans-serif; font-weight:700; padding:12px; border-radius:14px; margin-bottom:18px;
+    transition:background .2s ease;
+  }
+  .timerbar.urgent{ background:linear-gradient(90deg,#B8261A,#7A140C); }
+  .qtext{ font-size:16px; font-weight:700; margin-bottom:16px; }
+  .choices{ display:flex; flex-direction:column; gap:12px; }
+  .choice{
+    text-align:left; font-family:'Noto Sans Thai',sans-serif; font-size:14px; font-weight:500;
+    padding:14px 18px; border-radius:14px; border:2px solid #E8E4D8; background:#fff; cursor:pointer;
+    transition:all .12s ease;
+  }
+  .choice:hover:not(:disabled){ border-color:var(--purple1); }
+  .choice.correct{ background:#E4F9EA; border-color:var(--teal2); }
+  .choice.wrong{ background:#FCE4E2; border-color:var(--red2); }
+  .choice:disabled{ cursor:default; }
+  .testresult{ text-align:center; }
+  .scoreBig{ font-family:'Kanit',sans-serif; font-size:42px; font-weight:800; }
+  .tierpill{ display:inline-block; font-weight:700; padding:8px 20px; border-radius:999px; margin-top:6px; color:#fff; }
+
+  /* ---------- game ---------- */
+  .gamescore{ text-align:center; font-family:'Kanit',sans-serif; font-weight:700; font-size:18px; color:var(--purple2); margin-bottom:18px; }
+  .gamecols{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .gitem{
+    width:100%; font-family:'Noto Sans Thai',sans-serif; font-weight:600; font-size:14px;
+    padding:14px 16px; margin-bottom:12px; border-radius:14px; border:none; cursor:pointer;
+    background:linear-gradient(135deg,var(--peach1),var(--peach2)); color:var(--ink);
+    transition:all .15s ease; text-align:center;
+  }
+  .gitem:hover:not(:disabled){ transform:translateY(-2px); }
+  .gitem.selected{ outline:3px solid var(--purple1); }
+  .gitem.matched{ background:linear-gradient(135deg,var(--mint1),var(--mint2)); opacity:.7; cursor:default; }
+  .gitem.wrongflash{ background:linear-gradient(135deg,var(--red1),var(--red2)); color:#fff; }
+  #gameDone{ text-align:center; padding:14px 0; }
+  .gamebtns{ display:flex; gap:10px; justify-content:center; margin-top:8px; }
+
+  /* ---------- results ---------- */
+  .resultgrid{ display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px; }
+  .rescard{
+    background:linear-gradient(135deg,var(--blue1),var(--blue2)); color:#fff; border-radius:18px;
+    padding:22px; text-align:center;
+  }
+  .rescard .rlabel{ font-weight:700; font-size:14px; }
+  .rescard .rbig{ font-family:'Kanit',sans-serif; font-size:40px; font-weight:800; margin:8px 0 2px; }
+  .rescard .rsub{ font-size:12px; opacity:.9; }
+  .devbar{
+    background:linear-gradient(90deg,var(--teal1),var(--teal2)); color:#fff; text-align:center;
+    border-radius:16px; padding:18px; font-weight:600;
+  }
+  .devbar .l1{ font-size:15px; margin-bottom:4px; }
+  .devbar .l2{ font-size:13px; opacity:.95; }
+
+  .backbtn-wrap{ text-align:center; margin-top:6px; }
+
+  #toast{
+    position:fixed; top:16px; left:50%; transform:translateX(-50%) translateY(-20px);
+    background:var(--ink); color:#fff; font-weight:700; font-size:14px;
+    padding:12px 22px; border-radius:999px; z-index:60; opacity:0; pointer-events:none;
+    transition:opacity .25s ease, transform .25s ease;
+  }
+  #toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+  #modalOverlay{
+    position:fixed; inset:0; background:rgba(58,46,31,0.45); z-index:50;
+    display:flex; align-items:center; justify-content:center; padding:20px;
+  }
+  #modalBox{ background:#fff; border-radius:20px; padding:26px 24px; max-width:340px; text-align:center; box-shadow:0 20px 40px rgba(0,0,0,0.25); }
+  #modalBox h3{ margin:0 0 10px; font-size:18px; }
+  #modalBox p{ font-size:14px; opacity:.75; margin:0 0 18px; }
+  #modalBtns{ display:flex; gap:10px; justify-content:center; }
+
+  @media (max-width:640px){
+    .dashgrid{ grid-template-columns:repeat(2,1fr); }
+    .resultgrid, .gamecols{ grid-template-columns:1fr; }
+    .hero h2{ font-size:20px; }
+    .card{ padding:22px 18px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div><div class="blob b4"></div>
+
+<div id="app">
+  <div class="topbar">📘 บทเรียนออนไลน์</div>
+
+  <!-- ===================== LOGIN ===================== -->
+  <section id="sec-login">
+    <div class="hero">
+      <h2>🗄️ ฐานข้อมูลเบื้องต้น</h2>
+      <div class="sub">📘 สื่อนวัตกรรมดิจิทัลเพื่อใช้แก้ปัญหา | วิชาวิทยาการคำนวณ | โรงเรียนมัธยมบ้านบางกะปิ</div>
+    </div>
+    <div class="card">
+      <div class="wave">👋</div>
+      <h3>ยินดีต้อนรับสู่บทเรียนออนไลน์</h3>
+      <div class="center-sub">กรุณากรอกชื่อ-นามสกุลเพื่อเริ่มต้นการเรียนรู้</div>
+      <form id="loginForm">
+        <div class="inputwrap">
+          <input id="studentName" type="text" placeholder="กรอกชื่อ-นามสกุล" required>
+        </div>
+        <button type="submit" class="btn">🚀 เริ่มเรียน</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- ===================== HOME ===================== -->
+  <section id="sec-home" class="hidden">
+    <div class="hero">
+      <h2>🗄️ ฐานข้อมูลเบื้องต้น</h2>
+      <div class="sub">📘 สื่อนวัตกรรมดิจิทัลเพื่อใช้แก้ปัญหา | วิชาวิทยาการคำนวณ</div>
+      <div class="welcome" id="welcomeMsg"></div>
+    </div>
+    <div class="dashgrid">
+      <button class="dcard pink" id="dc-pretest">
+        <div class="dico">📝</div>
+        <div class="dtitle">แบบทดสอบก่อนเรียน</div>
+        <div class="ddesc">ทดสอบความรู้เบื้องต้นก่อนเรียน<br>10 ข้อ | 20 วินาที/ข้อ</div>
+      </button>
+      <button class="dcard mint" id="dc-content" disabled>
+        <span class="dlock">🔒</span>
+        <div class="dico">📖</div>
+        <div class="dtitle">เนื้อหาความรู้</div>
+        <div class="ddesc">เรียนรู้ 5 เรื่องเกี่ยวกับฐานข้อมูล</div>
+      </button>
+      <button class="dcard peach" id="dc-posttest" disabled>
+        <span class="dlock">🔒</span>
+        <div class="dico">✅</div>
+        <div class="dtitle">แบบทดสอบหลังเรียน</div>
+        <div class="ddesc">ทดสอบความเข้าใจหลังเรียน<br>10 ข้อ | 20 วินาที/ข้อ</div>
+      </button>
+      <button class="dcard mint" id="dc-game" disabled>
+        <span class="dlock">🔒</span>
+        <div class="dico">🎮</div>
+        <div class="dtitle">เกมโต้ตอบ</div>
+        <div class="ddesc">เกมจับคู่คำศัพท์ฐานข้อมูลกับความหมาย</div>
+      </button>
+      <button class="dcard peach" id="dc-results" disabled>
+        <span class="dlock">🔒</span>
+        <div class="dico">📊</div>
+        <div class="dtitle">ตรวจสอบคะแนน</div>
+        <div class="ddesc">ดูผลคะแนนและการพัฒนา</div>
+      </button>
+    </div>
+    <button class="btn red block" id="logoutBtn">🚪 ออกจากระบบ</button>
+  </section>
+
+  <!-- ===================== PRETEST ===================== -->
+  <section id="sec-pretest" class="hidden">
+    <div class="hero"><h2>📝 แบบทดสอบก่อนเรียน</h2><div class="sub">📘 สื่อนวัตกรรมดิจิทัลเพื่อใช้แก้ปัญหา | วิชาวิทยาการคำนวณ</div></div>
+    <div class="card"><div id="pretestArea"></div></div>
+  </section>
+
+  <!-- ===================== CONTENT ===================== -->
+  <section id="sec-content" class="hidden">
+    <div class="hero"><h2>📖 เนื้อหาความรู้</h2><div class="sub">📘 สื่อนวัตกรรมดิจิทัลเพื่อใช้แก้ปัญหา | วิชาวิทยาการคำนวณ</div></div>
+    <div class="tabrow" id="topicTabs"></div>
+    <div class="card">
+      <h3 id="tabHeading"></h3>
+      <div id="topicBody"></div>
+    </div>
+    <div class="backbtn-wrap"><button class="btn" data-back>🏠 กลับหน้าหลัก</button></div>
+  </section>
+
+  <!-- ===================== POSTTEST ===================== -->
+  <section id="sec-posttest" class="hidden">
+    <div class="hero"><h2>✅ แบบทดสอบหลังเรียน</h2><div class="sub">📘 สื่อนวัตกรรมดิจิทัลเพื่อใช้แก้ปัญหา | วิชาวิทยาการคำนวณ</div></div>
+    <div class="card"><div id="posttestArea"></div></div>
+  </section>
+
+  <!-- ===================== GAME ===================== -->
+  <section id="sec-game" class="hidden">
+    <div class="hero"><h2>🎮 เกมจับคู่คำศัพท์ฐานข้อมูล</h2><div class="sub">📘 สื่อนวัตกรรมดิจิทัลเพื่อใช้แก้ปัญหา | วิชาวิทยาการคำนวณ</div></div>
+    <div class="card">
+      <h3>จับคู่คำศัพท์ฐานข้อมูลกับความหมาย</h3>
+      <div class="center-sub">คลิกเลือกคำศัพท์และความหมายที่ตรงกัน</div>
+      <div id="gameArea"></div>
+    </div>
+    <div class="backbtn-wrap"><button class="btn" data-back>🏠 กลับหน้าหลัก</button></div>
+  </section>
+
+  <!-- ===================== RESULTS ===================== -->
+  <section id="sec-results" class="hidden">
+    <div class="hero"><h2>📊 ตรวจสอบคะแนนและการพัฒนา</h2><div class="sub">📘 สื่อนวัตกรรมดิจิทัลเพื่อใช้แก้ปัญหา | วิชาวิทยาการคำนวณ</div></div>
+    <div class="card">
+      <h3>ผลการเรียนรู้ของคุณ</h3>
+      <div id="resultsArea"></div>
+      <div class="backbtn-wrap" style="margin-top:16px;"><button class="btn" data-back>🏠 กลับหน้าหลัก</button></div>
+    </div>
+  </section>
+</div>
+
+<div id="toast"></div>
+<div id="modalOverlay" class="hidden">
+  <div id="modalBox">
+    <h3>ออกจากระบบ?</h3>
+    <p>ข้อมูลคะแนนทั้งหมดของคุณจะถูกลบออกจากเครื่องนี้</p>
+    <div id="modalBtns">
+      <button class="btn" id="modalCancel" style="background:#ddd; color:var(--ink); box-shadow:none;">ยกเลิก</button>
+      <button class="btn red" id="modalConfirm">ออกจากระบบ</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   DATA
+============================================================ */
+const QUESTIONS = [
+  { q:'ฐานข้อมูล (Database) หมายถึงอะไร?', choices:['ที่เก็บรวบรวมข้อมูลที่มีความสัมพันธ์กันอย่างเป็นระบบ','โปรแกรมสำหรับพิมพ์เอกสาร','เว็บไซต์สำหรับค้นหาข้อมูลทั่วไป','อุปกรณ์จัดเก็บไฟล์เสียง'], correct:0 },
+  { q:'ข้อใดคือตัวอย่างระบบจัดการฐานข้อมูล (DBMS)?', choices:['Photoshop','MySQL','PowerPoint','Chrome'], correct:1 },
+  { q:'โครงสร้างของตารางในฐานข้อมูลประกอบด้วยอะไรบ้าง?', choices:['หน้าและสไลด์','ไฟล์และโฟลเดอร์','แถว (Record) และคอลัมน์ (Field)','บรรทัดและตัวอักษร'], correct:2 },
+  { q:'ฟิลด์ที่ใช้ระบุแต่ละแถวข้อมูลไม่ให้ซ้ำกัน เรียกว่าอะไร?', choices:['Data Type','Query','คีย์หลัก (Primary Key)','Record'], correct:2 },
+  { q:'การเพิ่มข้อมูลแถวใหม่เข้าไปในตาราง เรียกว่าอะไร?', choices:['Delete','Update','Select','Insert'], correct:3 },
+  { q:'การลบข้อมูลที่ไม่ต้องการออกจากตาราง เรียกว่าอะไร?', choices:['Delete','Insert','Sort','Query'], correct:0 },
+  { q:'คิวรี (Query) คืออะไร?', choices:['ชื่อของตารางในฐานข้อมูล','คำสั่งที่ใช้ค้นหา/ดึงข้อมูลจากตารางตามเงื่อนไข','โปรแกรมสร้างฐานข้อมูล','ชนิดข้อมูลแบบตัวเลข'], correct:1 },
+  { q:'คำสั่งใดใช้เลือกดูข้อมูลจากตาราง?', choices:['WHERE','INSERT','SELECT','DELETE'], correct:2 },
+  { q:'แอ็กชันคิวรี (Action Query) แตกต่างจากคิวรีทั่วไปอย่างไร?', choices:['ใช้ค้นหาข้อมูลได้อย่างเดียว','ใช้เปลี่ยนแปลงข้อมูลในตาราง ไม่ใช่แค่ค้นหา','ใช้สร้างกราฟข้อมูล','ใช้พิมพ์รายงานออกทางเครื่องพิมพ์'], correct:1 },
+  { q:'คิวรีชนิดใดใช้สำหรับแก้ไขข้อมูลที่มีอยู่แล้วในตาราง?', choices:['SELECT','INSERT','UPDATE','DELETE'], correct:2 }
+];
+
+const TOPICS = [
+  { id:'t1', emoji:'💡', title:'ความรู้เบื้องต้นเกี่ยวกับฐานข้อมูล', cls:'sit-blue', points:[
+      { icon:'🗄️', term:'ฐานข้อมูล (Database) คืออะไร', desc:'ที่เก็บรวบรวมข้อมูลที่มีความสัมพันธ์กัน จัดเก็บอย่างเป็นระบบ เพื่อให้ค้นหาและนำไปใช้งานได้ง่าย' },
+      { icon:'⚙️', term:'ระบบจัดการฐานข้อมูล (DBMS)', desc:'ซอฟต์แวร์ที่ใช้สร้าง จัดการ และควบคุมการเข้าถึงฐานข้อมูล เช่น MySQL, Google Sheets, Microsoft Access' },
+      { icon:'✅', term:'ประโยชน์ของฐานข้อมูล', desc:'ลดความซ้ำซ้อนของข้อมูล ค้นหาข้อมูลได้รวดเร็ว มีความปลอดภัย และสามารถแชร์ข้อมูลร่วมกันได้' },
+      { icon:'🏗️', term:'โครงสร้างฐานข้อมูล', desc:'ฐานข้อมูล ➜ ตาราง (Table) ➜ แถวหรือเรคคอร์ด (Record) ➜ คอลัมน์หรือฟิลด์ (Field)' }
+  ]},
+  { id:'t2', emoji:'🧱', title:'การสร้างตารางเก็บข้อมูล', cls:'sit-teal', points:[
+      { icon:'📋', term:'ตาราง (Table) คืออะไร', desc:'โครงสร้างสำหรับเก็บข้อมูลเรื่องเดียวกัน แบ่งเก็บเป็นแถวและคอลัมน์' },
+      { icon:'🔡', term:'ฟิลด์ (Field)', desc:'คอลัมน์ในตาราง แต่ละฟิลด์ต้องกำหนดชนิดข้อมูลให้เหมาะสม เช่น ชื่อ อายุ วันเกิด' },
+      { icon:'🔢', term:'ชนิดข้อมูล (Data Type)', desc:'เช่น Text (ข้อความ), Number (ตัวเลข), Date (วันที่), Yes/No ต้องเลือกให้ตรงกับข้อมูลที่จะเก็บ' },
+      { icon:'🔑', term:'คีย์หลัก (Primary Key)', desc:'ฟิลด์ที่ใช้ระบุแต่ละแถวข้อมูลไม่ให้ซ้ำกัน เช่น รหัสนักเรียน' }
+  ]},
+  { id:'t3', emoji:'🛠️', title:'การจัดการข้อมูล และตาราง', cls:'sit-red', points:[
+      { icon:'➕', term:'เพิ่มข้อมูล (Insert)', desc:'การเพิ่มแถวข้อมูลใหม่เข้าไปในตารางที่มีอยู่แล้ว' },
+      { icon:'✏️', term:'แก้ไขข้อมูล (Update)', desc:'การเปลี่ยนแปลงข้อมูลที่มีอยู่แล้วให้ถูกต้องหรือเป็นปัจจุบัน' },
+      { icon:'🗑️', term:'ลบข้อมูล (Delete)', desc:'การนำแถวข้อมูลที่ไม่ต้องการออกจากตาราง' },
+      { icon:'🔀', term:'จัดเรียง/กรองข้อมูล (Sort/Filter)', desc:'การเรียงลำดับหรือคัดกรองข้อมูลในตารางตามเงื่อนไขที่ต้องการ' }
+  ]},
+  { id:'t4', emoji:'🔍', title:'การสร้างคิวรีเบื้องต้น', cls:'sit-purple', points:[
+      { icon:'❓', term:'คิวรี (Query) คืออะไร', desc:'คำสั่งที่ใช้ค้นหาหรือดึงข้อมูลจากตารางตามเงื่อนไขที่กำหนด' },
+      { icon:'🔎', term:'คำสั่ง SELECT', desc:'ใช้เลือกดูข้อมูลจากตาราง เช่น SELECT * FROM Students;' },
+      { icon:'🎯', term:'คำสั่ง WHERE', desc:'ใช้กำหนดเงื่อนไขในการค้นหา เช่น WHERE Age > 12' },
+      { icon:'⚡', term:'ประโยชน์ของคิวรี', desc:'ค้นหาข้อมูลเฉพาะที่ต้องการได้อย่างรวดเร็ว โดยไม่ต้องไล่ดูข้อมูลทั้งหมด' }
+  ]},
+  { id:'t5', emoji:'🚀', title:'การสร้างแอ็กชันคิวรี', cls:'sit-orange', points:[
+      { icon:'⚡', term:'แอ็กชันคิวรี (Action Query) คืออะไร', desc:'คิวรีที่ใช้เปลี่ยนแปลงข้อมูลในตาราง ไม่ใช่แค่ค้นหาข้อมูลอย่างเดียว' },
+      { icon:'➕', term:'INSERT Query', desc:'คิวรีสำหรับเพิ่มข้อมูลใหม่เข้าตาราง เช่น INSERT INTO Students VALUES (...);' },
+      { icon:'✏️', term:'UPDATE Query', desc:'คิวรีสำหรับแก้ไขข้อมูลที่มีอยู่แล้วให้เป็นค่าที่ต้องการ' },
+      { icon:'🗑️', term:'DELETE Query', desc:'คิวรีสำหรับลบข้อมูลออกจากตารางตามเงื่อนไขที่กำหนด' }
+  ]}
+];
+
+const GAME_PAIRS = [
+  { en:'Table', th:'ตาราง' },
+  { en:'Field', th:'ฟิลด์' },
+  { en:'Record', th:'เรคคอร์ด (แถวข้อมูล)' },
+  { en:'Query', th:'คิวรี' },
+  { en:'Primary Key', th:'คีย์หลัก' },
+  { en:'Database', th:'ฐานข้อมูล' }
+];
+
+const LS = {
+  name: 'caiLesson_name',
+  pretestDone: 'caiLesson_pretestDone',
+  pretestScore: 'caiLesson_pretestScore',
+  posttestScore: 'caiLesson_posttestScore',
+  posttestAttempts: 'caiLesson_posttestAttempts',
+  contentVersion: 'caiLesson_contentVersion'
+};
+
+/* ============================================================
+   STATE + HELPERS
+============================================================ */
+/* Bump this whenever the lesson content/questions change, so old
+   progress saved under a previous topic doesn't carry over and
+   lock out the new pretest. */
+const CONTENT_VERSION = 'db-fundamentals-v1';
+if(localStorage.getItem(LS.contentVersion) !== CONTENT_VERSION){
+  Object.values(LS).forEach(k=>{ if(k!==LS.contentVersion) localStorage.removeItem(k); });
+  localStorage.setItem(LS.contentVersion, CONTENT_VERSION);
+}
+
+let state = {
+  name: localStorage.getItem(LS.name) || '',
+  pretestDone: localStorage.getItem(LS.pretestDone) === '1',
+  pretestScore: parseInt(localStorage.getItem(LS.pretestScore) || '0', 10),
+  posttestScore: localStorage.getItem(LS.posttestScore) !== null ? parseInt(localStorage.getItem(LS.posttestScore), 10) : null,
+  posttestAttempts: parseInt(localStorage.getItem(LS.posttestAttempts) || '0', 10)
+};
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+function tierFor(score){
+  if(score >= 9) return { label:'เก่งมาก', emoji:'🏆', color:'var(--teal2)' };
+  if(score >= 7) return { label:'ดี', emoji:'🥈', color:'var(--blue2)' };
+  if(score >= 5) return { label:'พอใช้', emoji:'🥉', color:'var(--peach2)' };
+  return { label:'ต้องปรับปรุง', emoji:'📘', color:'var(--red2)' };
+}
+function devGradeFor(diff){
+  if(diff >= 8) return { grade:'A', label:'ยอดเยี่ยม' };
+  if(diff >= 6) return { grade:'B', label:'ดีมาก' };
+  if(diff >= 4) return { grade:'C', label:'ดี' };
+  if(diff >= 1) return { grade:'D', label:'ต้องปรับปรุง' };
+  return { grade:'E', label:'ควรทบทวนใหม่' };
+}
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 1800);
+}
+
+/* ============================================================
+   NAV
+============================================================ */
+const sections = ['login','home','pretest','content','posttest','game','results'];
+function goTo(name){
+  sections.forEach(s=>document.getElementById('sec-'+s).classList.toggle('hidden', s!==name));
+  if(name==='home') refreshHome();
+  if(name==='content') renderContentTabs();
+  if(name==='game') renderGame();
+  if(name==='results') renderResults();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+document.querySelectorAll('[data-back]').forEach(b=>b.addEventListener('click', ()=>goTo('home')));
+
+function refreshHome(){
+  document.getElementById('welcomeMsg').textContent = 'สวัสดี ' + state.name + '! 🎉';
+  const done = state.pretestDone;
+  document.getElementById('dc-pretest').disabled = done;
+  document.getElementById('dc-pretest').querySelector('.ddesc').innerHTML = done
+    ? 'ทำแบบทดสอบแล้ว ✅ (คะแนน ' + state.pretestScore + '/10)'
+    : 'ทดสอบความรู้เบื้องต้นก่อนเรียน<br>10 ข้อ | 20 วินาที/ข้อ';
+  ['content','posttest','game','results'].forEach(id=>{
+    const el = document.getElementById('dc-'+id);
+    el.disabled = !done;
+    const lock = el.querySelector('.dlock');
+    if(lock) lock.classList.toggle('hidden', done);
+  });
+}
+document.getElementById('dc-pretest').addEventListener('click', ()=>{
+  if(state.pretestDone) return;
+  goTo('pretest'); renderTest('pretestArea', false);
+});
+document.getElementById('dc-content').addEventListener('click', ()=>{ if(state.pretestDone) goTo('content'); });
+document.getElementById('dc-posttest').addEventListener('click', ()=>{ if(state.pretestDone){ goTo('posttest'); renderTest('posttestArea', true); } });
+document.getElementById('dc-game').addEventListener('click', ()=>{ if(state.pretestDone) goTo('game'); });
+document.getElementById('dc-results').addEventListener('click', ()=>{ if(state.pretestDone) goTo('results'); });
+
+/* ============================================================
+   LOGIN
+============================================================ */
+document.getElementById('loginForm').addEventListener('submit', (e)=>{
+  e.preventDefault();
+  const val = document.getElementById('studentName').value.trim();
+  if(!val) return;
+  state.name = val;
+  localStorage.setItem(LS.name, val);
+  goTo('home');
+});
+
+/* ============================================================
+   TEST ENGINE
+============================================================ */
+function buildAttemptQuestions(shuffleChoices){
+  return QUESTIONS.map(orig=>{
+    if(!shuffleChoices) return { q:orig.q, choices:orig.choices, correctIndex:orig.correct };
+    const order = shuffle(orig.choices.map((c,i)=>i));
+    return { q:orig.q, choices:order.map(i=>orig.choices[i]), correctIndex:order.indexOf(orig.correct) };
+  });
+}
+
+function renderTest(containerId, isPosttest){
+  const container = document.getElementById(containerId);
+  const attemptQs = buildAttemptQuestions(isPosttest);
+  let idx = 0, score = 0, timer = null, secondsLeft = 20, answered = false;
+
+  function renderQuestion(){
+    answered = false; secondsLeft = 20;
+    const qd = attemptQs[idx];
+    container.innerHTML = `
+      <div class="timerbar" id="timerBar">⏰ เวลา: ${secondsLeft} วินาที</div>
+      <div class="qtext">ข้อ ${idx+1}: ${qd.q}</div>
+      <div class="choices" id="choicesWrap"></div>
+    `;
+    const wrap = container.querySelector('#choicesWrap');
+    qd.choices.forEach((c,i)=>{
+      const b = document.createElement('button');
+      b.className = 'choice'; b.textContent = c;
+      b.addEventListener('click', ()=> submitAnswer(i));
+      wrap.appendChild(b);
+    });
+    startTimer();
+  }
+  function startTimer(){
+    clearInterval(timer); updateTimerUI();
+    timer = setInterval(()=>{
+      secondsLeft--; updateTimerUI();
+      if(secondsLeft<=0){ clearInterval(timer); if(!answered) submitAnswer(-1); }
+    },1000);
+  }
+  function updateTimerUI(){
+    const bar = container.querySelector('#timerBar');
+    if(!bar) return;
+    bar.textContent = '⏰ เวลา: ' + secondsLeft + ' วินาที';
+    bar.classList.toggle('urgent', secondsLeft<=5);
+  }
+  function submitAnswer(choiceIdx){
+    if(answered) return;
+    answered = true; clearInterval(timer);
+    const qd = attemptQs[idx];
+    const correct = choiceIdx === qd.correctIndex;
+    if(correct){ score += 1; }
+    container.querySelectorAll('.choice').forEach((b,i)=>{
+      b.disabled = true;
+      if(i===qd.correctIndex) b.classList.add('correct');
+      else if(i===choiceIdx) b.classList.add('wrong');
+    });
+    setTimeout(()=>{ idx++; if(idx<attemptQs.length) renderQuestion(); else finishTest(); }, 700);
+  }
+  function finishTest(){
+    if(!isPosttest){
+      state.pretestDone = true; state.pretestScore = score;
+      localStorage.setItem(LS.pretestDone,'1'); localStorage.setItem(LS.pretestScore,String(score));
+    } else {
+      state.posttestScore = score; state.posttestAttempts += 1;
+      localStorage.setItem(LS.posttestScore,String(score)); localStorage.setItem(LS.posttestAttempts,String(state.posttestAttempts));
+    }
+    const t = tierFor(score);
+    container.innerHTML = `
+      <div class="testresult">
+        <div>🎉 ทำแบบทดสอบเสร็จแล้ว!</div>
+        <div class="scoreBig">${score}<span style="font-size:18px;opacity:.55;"> / 10</span></div>
+        <div class="tierpill" style="background:${t.color}">${t.emoji} ${t.label}</div>
+        <div style="margin-top:22px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+          <button class="btn" id="homeBtn">🏠 กลับหน้าหลัก</button>
+          ${isPosttest ? `<button class="btn" id="retryBtn" style="background:linear-gradient(90deg,var(--teal1),var(--teal2))">🔄 ทำอีกครั้ง</button>` : ''}
+        </div>
+      </div>`;
+    container.querySelector('#homeBtn').addEventListener('click', ()=>goTo('home'));
+    if(isPosttest) container.querySelector('#retryBtn').addEventListener('click', ()=>renderTest('posttestArea', true));
+    showToast(isPosttest ? 'บันทึกคะแนนหลังเรียนแล้ว ✅' : 'บันทึกคะแนนก่อนเรียนแล้ว ✅');
+  }
+  renderQuestion();
+}
+
+/* ============================================================
+   CONTENT TABS
+============================================================ */
+let activeTopicIdx = 0;
+
+function renderContentTabs(){
+  const tabBar = document.getElementById('topicTabs');
+  tabBar.innerHTML = TOPICS.map((t,i)=>`
+    <button class="tabbtn ${i===activeTopicIdx?'active':''}" data-topic="${i}">${t.emoji} ${t.title}</button>
+  `).join('');
+  tabBar.querySelectorAll('.tabbtn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      activeTopicIdx = parseInt(btn.dataset.topic, 10);
+      renderContentTabs();
+    });
+  });
+  const topic = TOPICS[activeTopicIdx];
+  document.getElementById('tabHeading').textContent = topic.emoji + ' ' + topic.title;
+  document.getElementById('topicBody').innerHTML = topic.points.map(p=>`
+    <div class="situation ${topic.cls}">
+      <div class="stitle">${p.icon} ${p.term}</div>
+      <div class="line">${p.desc}</div>
+    </div>
+  `).join('');
+}
+
+/* ============================================================
+   GAME
+============================================================ */
+function renderGame(){
+  const area = document.getElementById('gameArea');
+  const enList = shuffle(GAME_PAIRS.map((p,i)=>({ i, text:p.en })));
+  const thList = shuffle(GAME_PAIRS.map((p,i)=>({ i, text:p.th })));
+  let selectedEn=null, selectedTh=null, matchedCount=0;
+
+  area.innerHTML = `
+    <div class="gamescore" id="gscore">คะแนน: 0/${GAME_PAIRS.length}</div>
+    <div class="gamecols"><div id="enCol"></div><div id="thCol"></div></div>
+    <div id="gameDone" class="hidden"></div>
+  `;
+  const enCol = area.querySelector('#enCol'), thCol = area.querySelector('#thCol');
+  enList.forEach(item=>{
+    const b=document.createElement('button'); b.className='gitem'; b.textContent='🔤 '+item.text;
+    b.addEventListener('click', ()=>pick('en',item.i,b)); enCol.appendChild(b);
+  });
+  thList.forEach(item=>{
+    const b=document.createElement('button'); b.className='gitem'; b.textContent='🇹🇭 '+item.text;
+    b.addEventListener('click', ()=>pick('th',item.i,b)); thCol.appendChild(b);
+  });
+
+  function pick(side, pairIdx, el){
+    if(el.classList.contains('matched')) return;
+    if(side==='en'){ if(selectedEn) selectedEn.el.classList.remove('selected'); selectedEn={pairIdx,el}; el.classList.add('selected'); }
+    else { if(selectedTh) selectedTh.el.classList.remove('selected'); selectedTh={pairIdx,el}; el.classList.add('selected'); }
+    if(selectedEn && selectedTh){
+      if(selectedEn.pairIdx === selectedTh.pairIdx){
+        selectedEn.el.classList.remove('selected'); selectedTh.el.classList.remove('selected');
+        selectedEn.el.classList.add('matched'); selectedTh.el.classList.add('matched');
+        selectedEn.el.disabled = true; selectedTh.el.disabled = true;
+        matchedCount++;
+        area.querySelector('#gscore').textContent = `คะแนน: ${matchedCount}/${GAME_PAIRS.length}`;
+        selectedEn=null; selectedTh=null;
+        if(matchedCount === GAME_PAIRS.length){
+          const done = area.querySelector('#gameDone');
+          done.classList.remove('hidden');
+          done.innerHTML = `<div style="font-size:36px;">🎉</div><h3 style="margin:6px 0;">เก่งมาก จับคู่ครบทุกคำแล้ว!</h3>
+            <div class="gamebtns"><button class="btn" id="playAgainBtn">🔁 เริ่มเกมใหม่</button></div>`;
+          done.querySelector('#playAgainBtn').addEventListener('click', renderGame);
+        }
+      } else {
+        const a=selectedEn.el,b2=selectedTh.el;
+        a.classList.add('wrongflash'); b2.classList.add('wrongflash');
+        setTimeout(()=>{ a.classList.remove('wrongflash','selected'); b2.classList.remove('wrongflash','selected'); },450);
+        selectedEn=null; selectedTh=null;
+      }
+    }
+  }
+}
+
+/* ============================================================
+   RESULTS
+============================================================ */
+function renderResults(){
+  const area = document.getElementById('resultsArea');
+  let html = `<div class="resultgrid">
+    <div class="rescard"><div class="rlabel">📝 คะแนนก่อนเรียน</div><div class="rbig">${state.pretestScore}</div><div class="rsub">จาก 10 คะแนน</div></div>`;
+  if(state.posttestScore === null){
+    html += `<div class="rescard" style="background:linear-gradient(135deg,#ccc,#999);"><div class="rlabel">✅ คะแนนหลังเรียน</div><div class="rbig" style="font-size:20px;">ยังไม่ได้ทำ</div></div></div>
+      <div class="backbtn-wrap"><button class="btn" id="gotoPostBtn2">ไปทำแบบทดสอบหลังเรียน</button></div>`;
+    area.innerHTML = html;
+    area.querySelector('#gotoPostBtn2').addEventListener('click', ()=>{ goTo('posttest'); renderTest('posttestArea', true); });
+    return;
+  }
+  const diff = state.posttestScore - state.pretestScore;
+  const dev = devGradeFor(diff);
+  html += `<div class="rescard"><div class="rlabel">✅ คะแนนหลังเรียน</div><div class="rbig">${state.posttestScore}</div><div class="rsub">จาก 10 คะแนน (ทำแล้ว ${state.posttestAttempts} ครั้ง)</div></div></div>
+    <div class="devbar">
+      <div class="l1">${diff>=0 ? '🎉 ยินดีด้วย! คุณพัฒนาขึ้น '+diff+' คะแนน' : '📉 คะแนนลดลง '+Math.abs(diff)+' คะแนน'}</div>
+      <div class="l2">ระดับคุณภาพ: ${dev.label} (${dev.grade})</div>
+    </div>`;
+  area.innerHTML = html;
+}
+
+/* ============================================================
+   LOGOUT
+============================================================ */
+document.getElementById('logoutBtn').addEventListener('click', ()=>{
+  document.getElementById('modalOverlay').classList.remove('hidden');
+});
+document.getElementById('modalCancel').addEventListener('click', ()=>{
+  document.getElementById('modalOverlay').classList.add('hidden');
+});
+document.getElementById('modalConfirm').addEventListener('click', ()=>{
+  Object.values(LS).forEach(k=>localStorage.removeItem(k));
+  state = { name:'', pretestDone:false, pretestScore:0, posttestScore:null, posttestAttempts:0 };
+  document.getElementById('loginForm').reset();
+  document.getElementById('modalOverlay').classList.add('hidden');
+  goTo('login');
+  showToast('ออกจากระบบแล้ว');
+});
+
+/* ============================================================
+   INIT
+============================================================ */
+if(state.name){ goTo('home'); } else { goTo('login'); }
+</script>
+</body>
+</html>
